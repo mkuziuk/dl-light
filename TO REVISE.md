@@ -1,4 +1,0 @@
-- Forward-mode, Reverse-m-ode: [[04 - Backpropagation and Autodiff]]
-- Optimization methods: [[05 - Optimization Algorithms in DL]]
-- BatchNorm: [[06 - Stabilization and Regularization]]
-- 
