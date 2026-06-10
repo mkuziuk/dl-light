@@ -1,11 +1,18 @@
-const sectionOrder = [
-  "Главная идея",
-  "Минимум для ответа",
-  "Формулы / схема",
-  "Диаграмма",
-  "Уточнения экзаменатора",
-  "Частые ошибки",
-];
+const answerVersions = {
+  light: "Light",
+  complete: "Complete",
+};
+
+const preferredSectionOrder = {
+  light: [
+    "Главная идея",
+    "Минимум для ответа",
+    "Формулы / схема",
+    "Диаграмма",
+    "Уточнения экзаменатора",
+    "Частые ошибки",
+  ],
+};
 
 const ratingLabels = {
   1: "Lost",
@@ -21,6 +28,7 @@ const state = {
   queue: [],
   current: null,
   revealed: false,
+  answerVersion: "light",
   view: "dashboard",
 };
 
@@ -93,6 +101,7 @@ function renderAll() {
   }
   renderReviewQueue();
   renderQuestionPanel();
+  renderAnswerPanel();
 }
 
 function setView(viewName) {
@@ -206,6 +215,7 @@ function startSession(mode) {
 async function selectQuestion(number) {
   state.current = await getJSON(`/api/questions/${number}`);
   state.revealed = false;
+  state.answerVersion = "light";
   renderReviewQueue();
   renderQuestionPanel();
   renderAnswerPanel();
@@ -306,27 +316,68 @@ function ratingButton(value, currentRating) {
 
 function renderAnswerPanel() {
   const panel = document.getElementById("answer-panel");
+  clearMath(panel);
   if (!state.current || !state.revealed) {
     panel.classList.add("is-hidden");
     panel.innerHTML = "";
     return;
   }
 
-  const sections = sectionOrder
-    .filter((sectionName) => state.current.sections?.[sectionName])
+  const answer = state.current.versions?.[state.answerVersion];
+  if (!answer) {
+    panel.classList.add("is-hidden");
+    panel.innerHTML = "";
+    return;
+  }
+
+  const sections = orderedSectionNames(answer, state.answerVersion)
     .map(
       (sectionName) => `
         <section class="answer-section">
           <h3>${escapeHTML(sectionName)}</h3>
-          ${renderMarkdown(state.current.sections[sectionName])}
+          ${renderMarkdown(answer.sections[sectionName])}
         </section>
       `,
     )
     .join("");
 
-  panel.innerHTML = sections;
+  panel.innerHTML = `
+    <div class="answer-version-bar">
+      <div>
+        <strong>${escapeHTML(answerVersions[state.answerVersion])} answer</strong>
+        <div class="subtle">${escapeHTML(answer.path)}</div>
+      </div>
+      <div class="segmented">
+        ${Object.entries(answerVersions)
+          .map(([version, label]) => {
+            const selected = version === state.answerVersion ? " is-active" : "";
+            return `<button class="${selected}" data-answer-version="${version}">${label}</button>`;
+          })
+          .join("")}
+      </div>
+    </div>
+    ${sections}
+  `;
   panel.classList.remove("is-hidden");
+  panel.querySelectorAll("[data-answer-version]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.answerVersion = button.dataset.answerVersion;
+      renderAnswerPanel();
+    });
+  });
   renderRichContent(panel);
+}
+
+function orderedSectionNames(answer, version) {
+  const allSections = answer.section_order ?? Object.keys(answer.sections ?? {});
+  const preferred = preferredSectionOrder[version];
+  if (!preferred) {
+    return allSections.filter((sectionName) => answer.sections?.[sectionName]);
+  }
+  return [
+    ...preferred.filter((sectionName) => answer.sections?.[sectionName]),
+    ...allSections.filter((sectionName) => !preferred.includes(sectionName)),
+  ];
 }
 
 async function saveRating(rating) {
@@ -425,7 +476,7 @@ function renderMarkdown(markdown) {
 
   const closeList = () => {
     if (listOpen) {
-      html.push("</ul>");
+      html.push(`</${listOpen}>`);
       listOpen = false;
     }
   };
@@ -456,6 +507,14 @@ function renderMarkdown(markdown) {
       continue;
     }
 
+    if (/^#{3,6}\s+/.test(trimmed)) {
+      closeList();
+      const level = Math.min(Number(trimmed.match(/^#+/)[0].length) + 1, 6);
+      const text = trimmed.replace(/^#{3,6}\s+/, "");
+      html.push(`<h${level}>${renderInline(text)}</h${level}>`);
+      continue;
+    }
+
     if (trimmed === "$$") {
       closeList();
       const block = [];
@@ -468,18 +527,38 @@ function renderMarkdown(markdown) {
       continue;
     }
 
+    if (isTableStart(lines, index)) {
+      closeList();
+      const tableLines = [lines[index], lines[index + 1]];
+      index += 2;
+      while (index < lines.length && isTableRow(lines[index])) {
+        tableLines.push(lines[index]);
+        index += 1;
+      }
+      index -= 1;
+      html.push(renderTable(tableLines));
+      continue;
+    }
+
     if (trimmed.startsWith("![")) {
       closeList();
       html.push(renderImage(trimmed));
       continue;
     }
 
-    if (trimmed.startsWith("- ")) {
+    if (trimmed.startsWith("- ") || /^\d+\.\s+/.test(trimmed)) {
+      const ordered = /^\d+\.\s+/.test(trimmed);
+      const tag = ordered ? "ol" : "ul";
       if (!listOpen) {
-        html.push("<ul>");
-        listOpen = true;
+        html.push(`<${tag}>`);
+        listOpen = tag;
+      } else if (listOpen !== tag) {
+        closeList();
+        html.push(`<${tag}>`);
+        listOpen = tag;
       }
-      html.push(`<li>${renderInline(trimmed.slice(2))}</li>`);
+      const itemText = ordered ? trimmed.replace(/^\d+\.\s+/, "") : trimmed.slice(2);
+      html.push(`<li>${renderInline(itemText)}</li>`);
       continue;
     }
 
@@ -500,6 +579,51 @@ function renderInline(value) {
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
 }
 
+function isTableStart(lines, index) {
+  return isTableRow(lines[index]) && isTableSeparator(lines[index + 1] ?? "");
+}
+
+function isTableRow(line) {
+  const trimmed = line.trim();
+  return trimmed.startsWith("|") && trimmed.endsWith("|") && trimmed.includes("|");
+}
+
+function isTableSeparator(line) {
+  const cells = splitTableCells(line);
+  return cells.length > 0 && cells.every((cell) => /^:?-{3,}:?$/.test(cell.trim()));
+}
+
+function splitTableCells(line) {
+  return line
+    .trim()
+    .replace(/^\|/, "")
+    .replace(/\|$/, "")
+    .split("|");
+}
+
+function renderTable(lines) {
+  const headerCells = splitTableCells(lines[0]);
+  const bodyRows = lines.slice(2).map(splitTableCells);
+  return `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>${headerCells.map((cell) => `<th>${renderInline(cell.trim())}</th>`).join("")}</tr>
+        </thead>
+        <tbody>
+          ${bodyRows
+            .map(
+              (row) => `
+                <tr>${row.map((cell) => `<td>${renderInline(cell.trim())}</td>`).join("")}</tr>
+              `,
+            )
+            .join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
 function renderRichContent(container) {
   renderDiagrams(container);
   renderMath(container);
@@ -510,10 +634,17 @@ async function renderMath(container) {
     return;
   }
   try {
+    clearMath(container);
     await window.MathJax.typesetPromise([container]);
   } catch (error) {
     console.error("MathJax rendering failed", error);
     showToast("Formula rendering failed");
+  }
+}
+
+function clearMath(container) {
+  if (window.MathJax?.typesetClear) {
+    window.MathJax.typesetClear([container]);
   }
 }
 
@@ -559,7 +690,7 @@ function normalizeImagePath(rawPath) {
   if (path.startsWith("<") && path.endsWith(">")) {
     path = path.slice(1, -1);
   }
-  path = path.replace(/^\.\.\//, "");
+  path = path.replace(/^(\.\.\/)+/, "");
   if (path.startsWith("assets/")) {
     return `/${path.split("/").map(encodeURIComponent).join("/")}`;
   }

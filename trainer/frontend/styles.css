@@ -509,12 +509,22 @@ select:focus-visible {
   display: none;
 }
 
+.answer-version-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px clamp(18px, 3vw, 30px);
+  border-bottom: 1px solid var(--line);
+  background: #fbfaf7;
+}
+
 .answer-section {
   padding: 22px clamp(18px, 3vw, 30px);
   border-top: 1px solid var(--line);
 }
 
-.answer-section:first-child {
+.answer-version-bar + .answer-section {
   border-top: 0;
 }
 
@@ -523,14 +533,23 @@ select:focus-visible {
   font-size: 18px;
 }
 
+.answer-section h4,
+.answer-section h5,
+.answer-section h6 {
+  margin: 18px 0 10px;
+  font-size: 16px;
+  line-height: 1.25;
+}
+
 .answer-section p,
 .answer-section li,
 .answer-section blockquote {
   line-height: 1.55;
 }
 
-.answer-section ul {
-  margin: 0;
+.answer-section ul,
+.answer-section ol {
+  margin: 0 0 12px;
   padding-left: 22px;
 }
 
@@ -568,6 +587,38 @@ select:focus-visible {
 
 .math-block mjx-container[jax="SVG"] {
   margin: 0;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  margin: 14px 0;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+}
+
+.answer-section table {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+  background: #ffffff;
+}
+
+.answer-section th,
+.answer-section td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.45;
+}
+
+.answer-section th {
+  background: #f7f4ed;
+  font-weight: 760;
+}
+
+.answer-section tr:last-child td {
+  border-bottom: 0;
 }
 
 .diagram-block {
@@ -705,5 +756,10 @@ select:focus-visible {
   .rating-pill {
     grid-column: 2;
     justify-self: start;
+  }
+
+  .answer-version-bar {
+    align-items: stretch;
+    flex-direction: column;
   }
 }

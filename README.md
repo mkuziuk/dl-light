@@ -3,8 +3,15 @@
 ![DL Oral Trainer dashboard](assets/trainer-dashboard.png)
 
 Compact Obsidian vault for preparing for the Deep Learning oral exam. The vault
-contains 62 question notes grouped by topic, plus a local self-check trainer for
-tracking confidence and review coverage.
+contains 62 exam questions with light and complete answer versions, plus a local
+self-check trainer for tracking confidence and review coverage.
+
+## Answer Folders
+
+- `light-answers/` contains compact oral-exam notes.
+- `complete-answers/` contains detailed answers copied from the full study vault.
+- Both folders keep the same topic folder names and note filenames.
+- `assets/` contains shared images used by the notes and README.
 
 ## Local Trainer
 
@@ -16,7 +23,8 @@ Main workflow:
 
 - open a balanced, weakest, unrated, or random review queue;
 - answer the original question from memory;
-- reveal the compact note;
+- reveal the answer;
+- choose between `Light` and `Complete` answer versions;
 - rate confidence from 1 to 5;
 - use the dashboard to find weak questions and uneven topic coverage.
 
@@ -106,9 +114,10 @@ On Windows, activate the environment first and run the same Python module:
 python -m trainer.backend.checks
 ```
 
-The check verifies that the app can parse exactly 62 question notes, sees 18
-topics, builds a suggested queue, and can write/read progress data in a temporary
-file. It also verifies that the local MathJax and Mermaid browser assets exist.
+The check verifies that the app can parse exactly 62 light notes and 62 complete
+notes, sees 18 topics, builds a suggested queue, and can write/read progress data
+in a temporary file. It also verifies that the local MathJax and Mermaid browser
+assets exist.
 
 ## Progress Data
 
