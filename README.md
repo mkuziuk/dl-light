@@ -22,6 +22,8 @@ Main workflow:
 
 ## Setup
 
+### macOS / Linux
+
 Create a Python virtual environment and install dependencies:
 
 ```bash
@@ -43,6 +45,42 @@ Then open:
 http://127.0.0.1:8000
 ```
 
+### Windows
+
+Use PowerShell from the repository root:
+
+```powershell
+py -3 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+```
+
+If PowerShell blocks virtual environment activation, allow scripts for the
+current shell session and activate again:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\.venv\Scripts\Activate.ps1
+```
+
+Run the trainer:
+
+```powershell
+uvicorn trainer.backend.main:app --host 127.0.0.1 --port 8000
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8000
+```
+
+In Command Prompt instead of PowerShell, activate with:
+
+```bat
+.venv\Scripts\activate.bat
+```
+
 Formulas and Mermaid diagrams are rendered by local frontend assets in
 `trainer/frontend/vendor/`. These files are checked into the vault, so npm is
 not required for normal use. To refresh them after changing `package.json`:
@@ -58,6 +96,13 @@ Run the built-in verification:
 
 ```bash
 source .venv/bin/activate
+python -m trainer.backend.checks
+```
+
+On Windows, activate the environment first and run the same Python module:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
 python -m trainer.backend.checks
 ```
 
