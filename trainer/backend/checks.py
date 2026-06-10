@@ -4,7 +4,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from .dashboard import build_dashboard
-from .parser import parse_all_notes, validate_notes
+from .parser import ANSWER_ROOTS, find_question_files, parse_all_notes, validate_notes
 from .progress import ProgressStore
 
 
@@ -16,6 +16,7 @@ def main() -> int:
     dashboard = build_dashboard(notes, progress)
     vendor_files = [
         vault_root / "trainer" / "frontend" / "vendor" / "mathjax" / "tex-svg-nofont.js",
+        vault_root / "trainer" / "frontend" / "vendor" / "mathjax" / "sre" / "speech-worker.js",
         vault_root / "trainer" / "frontend" / "vendor" / "mermaid" / "mermaid.min.js",
         vault_root / "trainer" / "data" / "progress.example.json",
     ]
@@ -26,6 +27,18 @@ def main() -> int:
         errors.append("Dashboard topic count is not 18")
     if not dashboard["suggested_queue"]:
         errors.append("Dashboard suggested queue is empty")
+    answer_paths = {
+        version: [
+            path.relative_to(vault_root / folder_name)
+            for path in find_question_files(vault_root / folder_name)
+        ]
+        for version, folder_name in ANSWER_ROOTS.items()
+    }
+    for version, paths in answer_paths.items():
+        if len(paths) != 62:
+            errors.append(f"Expected 62 {version} answer notes, found {len(paths)}")
+    if answer_paths.get("light") != answer_paths.get("complete"):
+        errors.append("Light and complete answer filenames do not match")
     for path in vendor_files:
         if not path.exists() or path.stat().st_size == 0:
             errors.append(f"Missing required app asset: {path.relative_to(vault_root)}")
@@ -44,6 +57,7 @@ def main() -> int:
 
     print("Checks passed:")
     print(f"- question notes: {dashboard['summary']['total_questions']}")
+    print("- answer versions: light=62, complete=62")
     print(f"- topics: {len(dashboard['topic_coverage'])}")
     print(f"- suggested queue: {len(dashboard['suggested_queue'])}")
     print("- progress write/read: ok")

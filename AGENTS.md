@@ -1,7 +1,9 @@
 # AGENTS.md
 
 This directory is an Obsidian vault for fast preparation for the Deep Learning
-oral exam. It is the compact companion to `/home/mikhail/Projects/studies/dl`.
+oral exam. It contains compact and complete answer versions for the same exam
+questions. The full study vault at `/home/mikhail/Projects/studies/dl` remains
+the canonical source for complete explanations.
 
 ## Canonical Sources
 
@@ -11,35 +13,58 @@ oral exam. It is the compact companion to `/home/mikhail/Projects/studies/dl`.
 - Do not edit `/home/mikhail/Projects/studies/dl` from this vault.
 - Preserve the meaning of every original question. Light cleanup of PDF line
   wrapping is allowed.
+- Keep `complete-answers/` synchronized from `/home/mikhail/Projects/studies/dl`
+  when complete explanations need to be refreshed.
 
 ## Vault Structure
 
-Keep exactly the same topic folders and note filenames as the detailed vault:
+Keep exactly the same topic folders and note filenames in both answer roots:
 
 ```text
-Topic 01 - DL Foundations and Training/
-Topic 02 - CNN Fundamentals/
-Topic 03 - CNN Architectures and Transfer Learning/
-Topic 04 - Segmentation and Pose/
-Topic 05 - Object Detection/
-Topic 06 - Knowledge Distillation/
-Topic 07 - Word Representations and Tokenization/
-Topic 08 - Recurrent and Seq2Seq Models/
-Topic 09 - Transformer Architecture/
-Topic 10 - NLP Pretraining and Model Families/
-Topic 11 - LLM Adaptation and Alignment/
-Topic 12 - LLM Inference and Augmentation/
-Topic 13 - Audio and Speech/
-Topic 14 - Vision Transformers/
-Topic 15 - Generative Models/
-Topic 16 - Graph Neural Networks/
-Topic 17 - Diffusion Models/
-Topic 18 - Multimodal Models/
+light-answers/
+  Topic 01 - DL Foundations and Training/
+  Topic 02 - CNN Fundamentals/
+  Topic 03 - CNN Architectures and Transfer Learning/
+  Topic 04 - Segmentation and Pose/
+  Topic 05 - Object Detection/
+  Topic 06 - Knowledge Distillation/
+  Topic 07 - Word Representations and Tokenization/
+  Topic 08 - Recurrent and Seq2Seq Models/
+  Topic 09 - Transformer Architecture/
+  Topic 10 - NLP Pretraining and Model Families/
+  Topic 11 - LLM Adaptation and Alignment/
+  Topic 12 - LLM Inference and Augmentation/
+  Topic 13 - Audio and Speech/
+  Topic 14 - Vision Transformers/
+  Topic 15 - Generative Models/
+  Topic 16 - Graph Neural Networks/
+  Topic 17 - Diffusion Models/
+  Topic 18 - Multimodal Models/
+complete-answers/
+  Topic 01 - DL Foundations and Training/
+  Topic 02 - CNN Fundamentals/
+  Topic 03 - CNN Architectures and Transfer Learning/
+  Topic 04 - Segmentation and Pose/
+  Topic 05 - Object Detection/
+  Topic 06 - Knowledge Distillation/
+  Topic 07 - Word Representations and Tokenization/
+  Topic 08 - Recurrent and Seq2Seq Models/
+  Topic 09 - Transformer Architecture/
+  Topic 10 - NLP Pretraining and Model Families/
+  Topic 11 - LLM Adaptation and Alignment/
+  Topic 12 - LLM Inference and Augmentation/
+  Topic 13 - Audio and Speech/
+  Topic 14 - Vision Transformers/
+  Topic 15 - Generative Models/
+  Topic 16 - Graph Neural Networks/
+  Topic 17 - Diffusion Models/
+  Topic 18 - Multimodal Models/
 assets/
 ```
 
-Every exam question gets exactly one Markdown file. Use the global two-digit
-question number as the filename prefix.
+Every exam question gets exactly one Markdown file in `light-answers/` and one
+matching Markdown file in `complete-answers/`. Use the global two-digit question
+number as the filename prefix.
 
 ## Compact Note Template
 
@@ -128,8 +153,9 @@ Common traps and confusions.
 uvicorn trainer.backend.main:app --host 127.0.0.1 --port 8000
 ```
 
-- The trainer reads compact Markdown notes as source data. Do not change note
-  content merely to support trainer UI behavior.
+- The trainer reads paired Markdown notes from `light-answers/` and
+  `complete-answers/`. Do not change note content merely to support trainer UI
+  behavior.
 - Frontend formula and diagram rendering uses local vendor assets under
   `trainer/frontend/vendor/`. If `package.json` changes, refresh them with
   `npm install` and `npm run vendor`.
@@ -144,11 +170,12 @@ uvicorn trainer.backend.main:app --host 127.0.0.1 --port 8000
 
 Before considering the compact vault complete, verify:
 
-- Exactly 62 question notes exist.
-- All topic folders and filenames match the detailed vault.
-- Every note includes `Original question`.
-- Every note includes the compact required headings.
-- Every note has exactly one Mermaid block.
-- Word counts are normally 250-400, with a 450-word ceiling for formula-heavy
-  topics.
-- No forbidden math delimiters appear in notes.
+- Exactly 62 compact notes exist under `light-answers/`.
+- Exactly 62 complete notes exist under `complete-answers/`.
+- Topic folders and filenames match exactly between the two answer roots.
+- Every compact note includes `Original question`.
+- Every compact note includes the compact required headings.
+- Every compact note has exactly one Mermaid block.
+- Compact-note word counts are normally 250-400, with a 450-word ceiling for
+  formula-heavy topics.
+- No forbidden math delimiters appear in compact notes.
