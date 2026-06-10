@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+node_modules/
+trainer/data/progress.json
+
+trainer/frontend/__pycache__/
+trainer/backend/__pycache__/
+
+dist/
+build/
+.DS_Store

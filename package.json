@@ -1,0 +1,13 @@
+{
+  "name": "dl-light-trainer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local rendering dependencies for the DL Oral Trainer frontend.",
+  "scripts": {
+    "vendor": "mkdir -p trainer/frontend/vendor/mathjax trainer/frontend/vendor/mermaid && cp node_modules/mathjax/tex-svg-nofont.js trainer/frontend/vendor/mathjax/tex-svg-nofont.js && cp node_modules/mermaid/dist/mermaid.min.js trainer/frontend/vendor/mermaid/mermaid.min.js"
+  },
+  "dependencies": {
+    "mathjax": "4.1.2",
+    "mermaid": "11.15.0"
+  }
+}

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DL Oral Trainer</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <div class="brand">DL Oral Trainer</div>
+        <div class="subtle">Self-check dashboard for the exam vault</div>
+      </div>
+      <nav class="tabs" aria-label="Primary">
+        <button class="tab is-active" data-view="dashboard">Dashboard</button>
+        <button class="tab" data-view="review">Review</button>
+        <button class="tab" data-view="browser">Questions</button>
+      </nav>
+    </header>
+
+    <main class="shell">
+      <section id="dashboard-view" class="view is-active" aria-labelledby="dashboard-title">
+        <div class="section-head">
+          <div>
+            <h1 id="dashboard-title">Dashboard</h1>
+            <p>Track weak questions and keep topic coverage balanced.</p>
+          </div>
+          <div class="actions">
+            <button class="primary" data-session="balanced">Start balanced review</button>
+          </div>
+        </div>
+
+        <div id="summary" class="metric-strip" aria-live="polite"></div>
+
+        <div class="dashboard-grid">
+          <section class="panel" aria-labelledby="queue-title">
+            <div class="panel-head">
+              <h2 id="queue-title">Suggested queue</h2>
+              <div class="segmented">
+                <button data-session="balanced">Balanced</button>
+                <button data-session="weakest">Weakest</button>
+                <button data-session="unrated">Unrated</button>
+              </div>
+            </div>
+            <div id="suggested-queue" class="question-list"></div>
+          </section>
+
+          <section class="panel" aria-labelledby="weak-title">
+            <div class="panel-head">
+              <h2 id="weak-title">Weakest now</h2>
+              <button class="ghost" data-session="weakest">Review weakest</button>
+            </div>
+            <div id="weakest-list" class="question-list compact"></div>
+          </section>
+        </div>
+
+        <section class="panel topic-panel" aria-labelledby="coverage-title">
+          <div class="panel-head">
+            <h2 id="coverage-title">Topic coverage</h2>
+            <span id="coverage-note" class="subtle"></span>
+          </div>
+          <div id="topic-coverage" class="topic-table"></div>
+        </section>
+      </section>
+
+      <section id="review-view" class="view" aria-labelledby="review-title">
+        <div class="review-layout">
+          <aside class="queue-rail">
+            <div class="rail-head">
+              <h2>Queue</h2>
+              <button class="ghost" id="shuffle-button">Shuffle</button>
+            </div>
+            <div class="segmented vertical">
+              <button data-session="balanced">Balanced</button>
+              <button data-session="weakest">Weakest</button>
+              <button data-session="unrated">Unrated</button>
+              <button data-session="random">Random</button>
+            </div>
+            <div id="review-queue" class="rail-list"></div>
+          </aside>
+
+          <article class="review-workspace">
+            <div class="section-head compact-head">
+              <div>
+                <h1 id="review-title">Review</h1>
+                <p id="review-subtitle">Pick a queue, answer from memory, reveal, then rate.</p>
+              </div>
+              <button class="ghost" id="next-button">Next</button>
+            </div>
+
+            <section id="question-panel" class="question-panel" aria-live="polite"></section>
+            <section id="answer-panel" class="answer-panel is-hidden"></section>
+          </article>
+        </div>
+      </section>
+
+      <section id="browser-view" class="view" aria-labelledby="browser-title">
+        <div class="section-head">
+          <div>
+            <h1 id="browser-title">Questions</h1>
+            <p>Browse all notes, filter by topic or rating, and jump into review.</p>
+          </div>
+          <button class="primary" data-session="random">Random review</button>
+        </div>
+
+        <div class="filters">
+          <label>
+            Search
+            <input id="search-input" type="search" placeholder="attention, VAE, IoU..." />
+          </label>
+          <label>
+            Topic
+            <select id="topic-filter"></select>
+          </label>
+          <label>
+            Rating
+            <select id="rating-filter">
+              <option value="all">All</option>
+              <option value="unrated">Unrated</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="question-table" class="question-table"></div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [["$", "$"]],
+          displayMath: [["$$", "$$"]],
+          processEscapes: true,
+        },
+        svg: {
+          fontCache: "none",
+        },
+        startup: {
+          typeset: false,
+        },
+      };
+    </script>
+    <script src="/static/vendor/mathjax/tex-svg-nofont.js"></script>
+    <script src="/static/vendor/mermaid/mermaid.min.js"></script>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
