@@ -365,7 +365,7 @@ function renderAnswerPanel() {
       renderAnswerPanel();
     });
   });
-  renderRichContent(panel);
+  void renderRichContent(panel);
 }
 
 function orderedSectionNames(answer, version) {
@@ -624,9 +624,9 @@ function renderTable(lines) {
   `;
 }
 
-function renderRichContent(container) {
-  renderDiagrams(container);
-  renderMath(container);
+async function renderRichContent(container) {
+  await renderDiagrams(container);
+  await renderMath(container);
 }
 
 async function renderMath(container) {
@@ -652,22 +652,41 @@ async function renderDiagrams(container) {
   if (!window.mermaid?.run) {
     return;
   }
-  const diagrams = container.querySelectorAll(".mermaid:not([data-processed])");
+  const diagrams = Array.from(container.querySelectorAll(".mermaid:not([data-processed])"));
   if (!diagrams.length) {
     return;
   }
-  try {
-    await window.mermaid.run({
-      querySelector: "#answer-panel .mermaid:not([data-processed])",
-    });
-  } catch (error) {
-    console.error("Mermaid rendering failed", error);
-    diagrams.forEach((diagram) => {
+
+  for (const diagram of diagrams) {
+    try {
+      await window.mermaid.run({
+        nodes: [diagram],
+      });
+      normalizeDiagramSize(diagram);
+    } catch (error) {
+      console.error("Mermaid rendering failed", error);
       diagram.classList.add("diagram-error");
       diagram.textContent = "Diagram rendering failed.";
-    });
-    showToast("Diagram rendering failed");
+      showToast("Diagram rendering failed");
+    }
   }
+}
+
+function normalizeDiagramSize(diagram) {
+  const svg = diagram.querySelector("svg");
+  const viewBox = svg?.getAttribute("viewBox");
+  if (!svg || !viewBox) {
+    return;
+  }
+
+  const [, , width, height] = viewBox.split(/\s+/).map(Number);
+  if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+    return;
+  }
+
+  svg.style.width = `${Math.ceil(width)}px`;
+  svg.style.maxWidth = "none";
+  svg.style.height = "auto";
 }
 
 function renderImage(line) {

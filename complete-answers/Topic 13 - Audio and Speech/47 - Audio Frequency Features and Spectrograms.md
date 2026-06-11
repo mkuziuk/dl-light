@@ -382,10 +382,10 @@ $$
 
 ```mermaid
 flowchart LR
-    A[Waveform x[n]] --> B[Framing with hop H]
-    B --> C[Window w[n]]
+    A["Waveform x[n]"] --> B["Framing with hop H"]
+    B --> C["Window w[n]"]
     C --> D[FFT per frame]
-    D --> E[Power spectrogram |X[m,k]|^2]
+    D --> E["Power spectrogram |X[m,k]|^2"]
     E --> F[Mel filterbank]
     F --> G[Log-mel features]
     G --> H[Neural ASR or audio model]
