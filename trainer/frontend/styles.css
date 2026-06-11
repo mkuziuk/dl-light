@@ -628,11 +628,11 @@ select:focus-visible {
   border: 1px solid var(--line);
   border-radius: 7px;
   background: #fbfaf7;
-  text-align: center;
 }
 
 .diagram-block svg {
-  max-width: 100%;
+  display: block;
+  margin: 0 auto;
   height: auto;
 }
 
